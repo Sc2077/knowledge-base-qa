@@ -1,6 +1,6 @@
 import { Layout as AntLayout, Menu, Button } from 'antd'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
-import { KnowledgeBaseOutlined, MessageOutlined, LogoutOutlined } from '@ant-design/icons'
+import { BookOutlined, MessageOutlined, LogoutOutlined } from '@ant-design/icons'
 import { authService } from '../services/auth'
 
 const { Header, Content, Sider } = AntLayout
@@ -23,7 +23,7 @@ const Layout = () => {
     },
     {
       key: '/knowledge-bases',
-      icon: <KnowledgeBaseOutlined />,
+      icon: <BookOutlined />,
       label: '知识库',
       onClick: () => navigate('/knowledge-bases'),
     },

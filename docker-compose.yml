@@ -101,7 +101,7 @@ services:
       - MILVUS_HOST=milvus
       - MILVUS_PORT=19530
       - OLLAMA_BASE_URL=http://ollama:11434
-      - OLLAMA_MODEL=all-minilm
+      - OLLAMA_MODEL=nomic-embed-text
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
       - DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
       - DEEPSEEK_MODEL=deepseek-chat

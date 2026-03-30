@@ -54,8 +54,11 @@ class DocumentService:
             return
         
         try:
+            print(f"Processing document {document_id}: file_type={document.file_type}")
+            
             # 1. 解析文件
             text = self.file_parser.parse_file(document.file_type, document.file_path)
+            print(f"File parsed, text length: {len(text)}")
             
             if not text.strip():
                 await self._update_document_status(
@@ -65,6 +68,9 @@ class DocumentService:
             
             # 2. 分割文本
             chunks_data = self.text_splitter.split_text_with_metadata(text, document_id)
+            print(f"Text split into {len(chunks_data)} chunks")
+            print(f"First chunk type: {type(chunks_data[0]) if chunks_data else 'empty'}")
+            print(f"First chunk: {chunks_data[0] if chunks_data else 'empty'}")
             
             if not chunks_data:
                 await self._update_document_status(
@@ -74,13 +80,17 @@ class DocumentService:
             
             # 3. 生成向量
             texts = [chunk["text"] for chunk in chunks_data]
+            print(f"Extracted {len(texts)} texts from chunks")
             embeddings = await self.embedding_service.embed_texts(texts)
+            print(f"Embeddings generated, count: {len(embeddings)}")
             
             # 4. 确保Milvus集合存在
             self.milvus_store.create_collection(kb.collection_name)
+            print(f"Milvus collection created/verified: {kb.collection_name}")
             
             # 5. 存储到Milvus
             self.milvus_store.insert_chunks(kb.collection_name, chunks_data, embeddings)
+            print(f"Inserted {len(chunks_data)} chunks into Milvus")
             
             # 6. 更新文档状态
             await self._update_document_status(
@@ -88,8 +98,12 @@ class DocumentService:
             )
             
         except Exception as e:
+            import traceback
+            error_msg = f"{type(e).__name__}: {str(e)}"
+            print(f"Error processing document {document_id}: {error_msg}")
+            print(f"Full traceback:\n{traceback.format_exc()}")
             await self._update_document_status(
-                document_id, db, "failed", str(e)
+                document_id, db, "failed", error_msg
             )
     
     async def _update_document_status(

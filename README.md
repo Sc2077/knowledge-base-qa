@@ -66,7 +66,7 @@ docker-compose logs -f backend
 docker exec -it kb_qa_ollama bash
 
 # 下载向量模型
-ollama pull all-minilm
+ollama pull nomic-embed-text
 
 # 退出容器
 exit

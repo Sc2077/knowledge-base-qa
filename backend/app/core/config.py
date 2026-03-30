@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     
     # Ollama
     OLLAMA_BASE_URL: str = "http://ollama:11434"
-    OLLAMA_MODEL: str = "all-minilm"
+    OLLAMA_MODEL: str = "nomic-embed-text"
     
     # DeepSeek
     DEEPSEEK_API_KEY: str = ""

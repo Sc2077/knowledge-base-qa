@@ -22,8 +22,23 @@ class EmbeddingService:
                 timeout=60.0
             )
             response.raise_for_status()
-            result = response.json()
-            return result.get("embedding", [])
+            
+            try:
+                result = response.json()
+            except Exception as e:
+                raise ValueError(f"Failed to parse JSON response: {str(e)}. Response text: {response.text[:500]}")
+            
+            if not isinstance(result, dict):
+                raise ValueError(f"Response is not a dictionary: {type(result).__name__}. Response: {str(result)[:500]}")
+            
+            embedding = result.get("embedding")
+            if embedding is None:
+                raise ValueError(f"'embedding' key not found in response. Available keys: {list(result.keys())}")
+            
+            if not isinstance(embedding, list):
+                raise ValueError(f"Embedding is not a list: {type(embedding).__name__}")
+            
+            return embedding
     
     async def embed_texts(self, texts: List[str]) -> List[List[float]]:
         """批量将文本转换为向量"""

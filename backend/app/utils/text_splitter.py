@@ -40,7 +40,7 @@ class TextSplitter:
     def split_text_with_metadata(self, text: str, doc_id: str) -> List[dict]:
         """分割文本并添加元数据"""
         chunks = self.split_text(text)
-        
+
         result = []
         for i, chunk in enumerate(chunks):
             result.append({
@@ -48,5 +48,5 @@ class TextSplitter:
                 "chunk_index": i,
                 "doc_id": doc_id
             })
-        
-        return chunks
+
+        return result

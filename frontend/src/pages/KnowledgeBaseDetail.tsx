@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Upload, List, Button, Empty, message, Tag, Modal, Input } from 'antd'
+import { Upload, List, Button, Empty, message, Tag, Modal, Space } from 'antd'
 import { InboxOutlined, ArrowLeftOutlined } from '@ant-design/icons'
 import type { UploadProps } from 'antd'
 import { knowledgeBaseService, KnowledgeBase } from '../services/knowledgeBase'

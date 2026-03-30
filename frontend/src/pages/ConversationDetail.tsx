@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'react-router-dom'
-import { Input, Button, List, Empty, Select, Space, Spin } from 'antd'
+import { Input, Button, List, Empty, Select, Spin } from 'antd'
 import { SendOutlined } from '@ant-design/icons'
 import { conversationService, Conversation, Message } from '../services/conversation'
 import { knowledgeBaseService, KnowledgeBase } from '../services/knowledgeBase'
@@ -10,7 +10,6 @@ const ConversationDetail = () => {
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
   const [streaming, setStreaming] = useState(false)
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([])
   const [selectedKB, setSelectedKB] = useState<string | undefined>()
@@ -52,6 +51,16 @@ const ConversationDetail = () => {
 
     const question = input
     setInput('')
+
+    // 先添加用户消息到消息列表
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      conversation_id: id!,
+      role: 'user',
+      content: question,
+      created_at: new Date().toISOString(),
+    }
+    setMessages(prev => [...prev, userMessage])
     setStreaming(true)
 
     try {
@@ -59,6 +68,15 @@ const ConversationDetail = () => {
       const reader = stream.getReader()
       const decoder = new TextDecoder()
       let fullAnswer = ''
+
+      // 添加空的助手消息占位
+      setMessages(prev => [...prev, {
+        id: (Date.now() + 1).toString(),
+        conversation_id: id!,
+        role: 'assistant',
+        content: '',
+        created_at: new Date().toISOString(),
+      }])
 
       while (true) {
         const { done, value } = await reader.read()
@@ -76,16 +94,8 @@ const ConversationDetail = () => {
                 setMessages(prev => {
                   const newMessages = [...prev]
                   const lastMessage = newMessages[newMessages.length - 1]
-                  if (lastMessage && lastMessage.role === 'assistant' && streaming) {
+                  if (lastMessage && lastMessage.role === 'assistant') {
                     lastMessage.content = fullAnswer
-                  } else {
-                    newMessages.push({
-                      id: Date.now().toString(),
-                      conversation_id: id!,
-                      role: 'assistant',
-                      content: fullAnswer,
-                      created_at: new Date().toISOString(),
-                    })
                   }
                   return newMessages
                 })

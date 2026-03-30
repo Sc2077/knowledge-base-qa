@@ -13,7 +13,7 @@
 - Milvus 2.3.4 (向量数据库)
 - PyMilvus (Milvus Python 客户端)
 - DeepSeek API (问答模型)
-- Ollama (本地向量模型服务，使用 all-minilm)
+- Ollama (本地向量模型服务，使用 nomic-embed-text)
 - JWT 认证
 
 **前端:**
@@ -137,7 +137,7 @@ docker-compose logs -f frontend
 docker exec -it kb_qa_ollama bash
 
 # 下载向量模型
-ollama pull all-minilm
+ollama pull nomic-embed-text
 
 # 退出容器
 exit
@@ -201,7 +201,7 @@ JWT_SECRET_KEY=your_jwt_secret_key_change_this
 - `DATABASE_URL`: MySQL 连接字符串
 - `MILVUS_HOST`: Milvus 服务地址
 - `OLLAMA_BASE_URL`: Ollama 服务地址
-- `OLLAMA_MODEL`: 向量模型名称（默认: all-minilm）
+- `OLLAMA_MODEL`: 向量模型名称（默认: nomic-embed-text）
 - `DEEPSEEK_BASE_URL`: DeepSeek API 地址
 - `DEEPSEEK_MODEL`: DeepSeek 模型名称（默认: deepseek-chat）
 
@@ -326,7 +326,7 @@ JWT_SECRET_KEY=your_jwt_secret_key_change_this
 
 - 每个知识库对应一个 Milvus 集合
 - 集合名称格式: `kb_{uuid}`
-- 向量维度: 由嵌入模型决定（all-minilm 为 384 维）
+- 向量维度: 由嵌入模型决定（nomic-embed-text 为 768 维）
 - 删除知识库时自动删除对应的 Milvus 集合
 
 ## 数据库初始化

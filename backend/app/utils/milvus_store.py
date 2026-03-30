@@ -19,7 +19,7 @@ class MilvusStore:
             port=self.port
         )
     
-    def create_collection(self, collection_name: str, dimension: int = 384) -> Collection:
+    def create_collection(self, collection_name: str, dimension: int = 768) -> Collection:
         """创建集合"""
         # 检查集合是否已存在
         if utility.has_collection(collection_name):

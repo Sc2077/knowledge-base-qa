@@ -1,4 +1,4 @@
-FROM python:3.12-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y \
 # 复制依赖文件
 COPY requirements.txt .
 
-# 安装Python依赖
-RUN pip install --no-cache-dir -r requirements.txt
+# 安装 setuptools 并确保 pkg_resources 可用
+RUN pip install --no-cache-dir --upgrade setuptools wheel
+
+# 安装所有依赖（优先使用预编译版本）
+RUN pip install --no-cache-dir --prefer-binary --timeout 600 -r requirements.txt
 
 # 复制应用代码
 COPY . .

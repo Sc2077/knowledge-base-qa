@@ -56,9 +56,7 @@ async def create_knowledge_base(
         
         # 获取向量维度
         embedding_service = EmbeddingService()
-        test_embedding = await asyncio.create_task(
-            embedding_service.embed_text("test")
-        )
+        test_embedding = await embedding_service.embed_text("test")
         dimension = len(test_embedding)
         
         milvus_store.create_collection(collection_name, dimension)

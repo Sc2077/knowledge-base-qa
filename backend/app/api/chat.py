@@ -18,11 +18,13 @@ async def chat_stream_generator(
     rag_service: RAGService,
     question: str,
     conversation_history: list,
-    collection_name: str = None
+    collection_name: str = None,
+    db: AsyncSession = None,
+    conv_id: str = None
 ):
     """流式响应生成器"""
     full_answer = ""
-    
+
     try:
         async for chunk in rag_service.chat(
             question=question,
@@ -32,7 +34,17 @@ async def chat_stream_generator(
             full_answer += chunk
             # 发送SSE格式数据
             yield f"data: {json.dumps({'chunk': chunk}, ensure_ascii=False)}\n\n"
-        
+
+        # 保存 AI 回复消息到数据库
+        if db and conv_id and full_answer:
+            assistant_message = Message(
+                conversation_id=conv_id,
+                role="assistant",
+                content=full_answer
+            )
+            db.add(assistant_message)
+            await db.commit()
+
         # 发送结束信号
         yield f"data: {json.dumps({'done': True, 'full_answer': full_answer}, ensure_ascii=False)}\n\n"
     except Exception as e:
@@ -103,14 +115,16 @@ async def chat(
     
     # 创建RAG服务
     rag_service = RAGService()
-    
+
     # 返回流式响应
     return StreamingResponse(
         chat_stream_generator(
             rag_service=rag_service,
             question=chat_request.question,
             conversation_history=conversation_history,
-            collection_name=collection_name
+            collection_name=collection_name,
+            db=db,
+            conv_id=conv_id
         ),
         media_type="text/event-stream"
     )

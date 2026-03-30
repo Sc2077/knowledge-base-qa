@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, BackgroundTasks
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy import select
 from typing import List
 import os
 import uuid
 import asyncio
-from app.core.database import get_db
+from app.core.database import get_db, engine
 from app.core.config import settings
 from app.schemas.document import DocumentResponse
 from app.models.document import Document
@@ -16,10 +16,16 @@ from app.services.document_service import DocumentService
 router = APIRouter(prefix="/api/documents", tags=["documents"])
 
 
-async def process_document_task(document_id: str, db: AsyncSession):
+async def process_document_task(document_id: str):
     """后台任务：处理文档"""
-    document_service = DocumentService()
-    await document_service.process_document(document_id, db)
+    # 创建新的数据库会话
+    AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+    async with AsyncSessionLocal() as db:
+        try:
+            document_service = DocumentService()
+            await document_service.process_document(document_id, db)
+        except Exception as e:
+            print(f"Error processing document {document_id}: {str(e)}")
 
 
 @router.post("/upload", response_model=DocumentResponse)
@@ -95,7 +101,7 @@ async def upload_document(
     await db.refresh(document)
     
     # 添加后台任务处理文档
-    background_tasks.add_task(process_document_task, document.id, db)
+    background_tasks.add_task(process_document_task, document.id)
     
     return document
 
