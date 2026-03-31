@@ -133,12 +133,14 @@ async def get_conversation_messages(
             detail="Conversation not found"
         )
     
-    # 获取消息列表
+    # 获取消息列表，按创建时间升序排列（最早的在前，最新的在后）
     from app.models.message import Message
     from app.schemas.message import MessageResponse
     
     result = await db.execute(
-        select(Message).where(Message.conversation_id == conv_id)
+        select(Message)
+        .where(Message.conversation_id == conv_id)
+        .order_by(Message.created_at.asc())
     )
     messages = result.scalars().all()
     
